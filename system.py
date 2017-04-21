@@ -57,41 +57,41 @@ def main():
     sun = Planet(1.989*pow(10, 30), 0, 0, 0, 0)
     earth = Planet(5.972*pow(10, 24), 150000000000, 0, 0, 30000)
     
+    planets = [earth]
     #integration time
-    dt = 86400  #second
+    dt = 86400  #seconds
 
     #main loop of the program
     i = 0
-    while (i < 365):
-        r  = math.sqrt(pow(sun.x-earth.x, 2) + pow(sun.y-earth.y, 2))
-        rx = sun.x-earth.x
-        ry = sun.y-earth.y
+    while (i < 3650):
+        for planet in planets:
+            r  = math.sqrt(pow(sun.x-planet.x, 2) + pow(sun.y-planet.y, 2))
+            rx = sun.x-planet.x
+            ry = sun.y-planet.y
 
-        axsun = (G*earth.m)*(-rx)/pow(r, 3)
-        aysun = (G*earth.m)*(-ry)/pow(r, 3)
-        axearth = (G*sun.m)*(rx)/pow(r, 3)
-        ayearth = (G*sun.m)*(ry)/pow(r, 3)
+            axsun = (G*planet.m)*(-rx)/pow(r, 3)
+            aysun = (G*planet.m)*(-ry)/pow(r, 3)
+            axplanet = (G*sun.m)*(rx)/pow(r, 3)
+            ayplanet = (G*sun.m)*(ry)/pow(r, 3)
 
-        vxsun = sun.vx + axsun*dt
-        vysun = sun.vy + aysun*dt
-        vxearth = earth.vx + axearth*dt
-        vyearth = earth.vy + ayearth*dt
+            vxsun = sun.vx + axsun*dt
+            vysun = sun.vy + aysun*dt
+            vxplanet = planet.vx + axplanet*dt
+            vyplanet = planet.vy + ayplanet*dt
 
-        xsun = sun.x + vxsun*dt
-        ysun = sun.y + vysun*dt
-        xearth = earth.x + vxearth*dt
-        yearth = earth.y + vyearth*dt
+            xsun = sun.x + vxsun*dt
+            ysun = sun.y + vysun*dt
+            xplanet = planet.x + vxplanet*dt
+            yplanet = planet.y + vyplanet*dt
         
-        sun.update(xsun, ysun, vxsun, vysun)
-        earth.update(xearth, yearth, vxearth, vyearth)
+            sun.update(xsun, ysun, vxsun, vysun)
+            planet.update(xplanet, yplanet, vxplanet, vyplanet)
 
-        #sun.print_state()
-        pygame.draw.circle(window, WHITE, (int(sun.x*P2M) + WIDTH/2, int(sun.y*P2M) + HEIGHT/2), 40, 0) 
-        #earth.print_state()
-        pygame.draw.circle(window, WHITE, (int(earth.x*P2M + WIDTH/2), int(earth.y*P2M) + HEIGHT/2), 2, 0)
+            pygame.draw.circle(window, WHITE, (int(sun.x*P2M) + WIDTH/2, int(sun.y*P2M) + HEIGHT/2), 40, 0) 
+            pygame.draw.circle(window, WHITE, (int(planet.x*P2M + WIDTH/2), int(planet.y*P2M) + HEIGHT/2), 2, 0)
+        
         pygame.display.update()
         time.sleep(0.01)
-
         i += 1
     
     time.sleep(10)
