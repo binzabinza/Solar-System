@@ -1,0 +1,14 @@
+#John Binzer
+#Euler Method
+#
+# Used to approximate the solution of the initial value problem
+#             y'=f(t, y)  on interval  [a, b]  with initial condition   y(a) = alpha
+# at N+1 spaced intervals
+
+def euler(a, b, N, alpha):
+    h = (b-a)/N
+    t = a
+    w = alpha
+    print "(%d, %d)" % (t,w)
+
+euler(1, 2, 4, 6)
