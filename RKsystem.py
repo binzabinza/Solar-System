@@ -37,8 +37,8 @@ WIDTH, HEIGHT = 1920, 1200
 G = 6.67408*pow(10, -11)
 
 #lets make 300 pixels = 1 au = 150000000000m
-#P2M = 1.2334575*pow(10, -9) #pixels/meter
-P2M = 1.623541*pow(10,-10) 
+P2M = 1.2334575*pow(10, -9) #pixels/meter
+#P2M = 1.623541*pow(10,-10) 
 
 class Planet:
 
@@ -93,42 +93,57 @@ def main():
     planets = make_objects()
     sun     = Planet(1.9890*pow(10, 30), 0, 0, 0, 0, YELLOW)
  
-    #integration time
-    dt = 43200  #seconds
 
-    #main loop of the program
-    i = 0
-    while (i < 50000):
+    #main loop of the program using RK method for system of ODEs
+    N  = 50000
+    dt = 86400 #second #value of h
+    t  = 0
+
+    i  = 0
+    while (i < N):
         for planet in planets:
             r  = math.sqrt(pow(sun.x-planet.x, 2) + pow(sun.y-planet.y, 2))
-            rx = sun.x-planet.x
-            ry = sun.y-planet.y
+            
+            #solving for x values
+            k11 = dt*planet.vx
+            k12 = dt*(G*sun.m)/pow(r, 3)*(sun.x - planet.x)
 
-            axsun = (G*planet.m)*(-rx)/pow(r, 3)
-            aysun = (G*planet.m)*(-ry)/pow(r, 3)
-            axplanet = (G*sun.m)*(rx)/pow(r, 3)
-            ayplanet = (G*sun.m)*(ry)/pow(r, 3)
+            k21 = dt*(planet.vx + 0.5*k12)
+            k22 = dt*(G*sun.m/pow(r, 3)*(sun.x - (planet.x + 0.5*k11)))
 
-            vxsun = sun.vx + axsun*dt
-            vysun = sun.vy + aysun*dt
-            vxplanet = planet.vx + axplanet*dt
-            vyplanet = planet.vy + ayplanet*dt
+            k31 = dt*(planet.vx + 0.5*k22)
+            k32 = dt*(G*sun.m/pow(r, 3)*(sun.x - (planet.x + 0.5*k21)))
 
-            xsun = sun.x + vxsun*dt
-            ysun = sun.y + vysun*dt
-            xplanet = planet.x + vxplanet*dt
-            yplanet = planet.y + vyplanet*dt
-        
-            sun.update(xsun, ysun, vxsun, vysun)
+            k41 = dt*(planet.vx + k32)
+            k42 = dt*(G*sun.m/pow(r, 3)*(sun.x - (planet.x + 0.5*k31)))
+
+            xplanet  = planet.x  + 1.0/6*(k11 + 2*k21 + 2*k31 + k41)
+            vxplanet = planet.vx + 1.0/6*(k12 + 2*k22 + 2*k32 + k42)
+
+            #solving for y values
+            m11 = dt*planet.vy
+            m12 = dt*(G*sun.m)/pow(r, 3)*(sun.y - planet.y)
+
+            m21 = dt*(planet.vy + 0.5*m12)
+            m22 = dt*(G*sun.m/pow(r, 3)*(sun.y - (planet.y + 0.5*m11)))
+
+            m31 = dt*(planet.vx + 0.5*m22)
+            m32 = dt*(G*sun.m/pow(r, 3)*(sun.y - (planet.y + 0.5*m21)))
+
+            m41 = dt*(planet.vy + m32)
+            m42 = dt*(G*sun.m/pow(r, 3)*(sun.y - (planet.y + 0.5*m31)))
+            yplanet  = planet.y  + 1.0/6*(m11 + 2*m21 + 2*m31 + m41)
+            vyplanet = planet.vy + 1.0/6*(m12 + 2*m22 + 2*m32 + m42)
+
+
             planet.update(xplanet, yplanet, vxplanet, vyplanet)
+            planet.print_state()
 
             pygame.draw.circle(window, sun.color, (int(sun.x*P2M) + WIDTH/2, int(sun.y*P2M) + HEIGHT/2), 25, 0)
             pygame.draw.circle(window, BLACK, (int(sun.x*P2M) + WIDTH/2, int(sun.y*P2M) + HEIGHT/2), 1, 0)
             pygame.draw.circle(window, planet.color, (int(planet.x*P2M + WIDTH/2), int(planet.y*P2M) + HEIGHT/2), 2, 0)
-
-        t = str((i*dt)/86400)
-        timestamp(t + " Days", tfont, window)
-        #time.sleep(0.01)
+        t = i*dt
+        timestamp(str(t/86400) + " Days", tfont, window)
         i += 1
     
     time.sleep(10)

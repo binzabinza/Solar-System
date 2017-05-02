@@ -5,8 +5,6 @@ Python based simulation of the solar system.
 
 For this simulation, the mass of the sun is considered so much greater than any of the planets, that each planet will be evaluated as a 2-body problem, ignoring the gravitational forces of any other planets.
 
-A Runge-Kutta Method for solvind ODEs will be using to update position, velocity, and acceleration
-
 All units are standard SI units. (meters, seconds, kilograms, etc)
 
 John Binzer
@@ -37,8 +35,8 @@ WIDTH, HEIGHT = 1920, 1200
 G = 6.67408*pow(10, -11)
 
 #lets make 300 pixels = 1 au = 150000000000m
-#P2M = 1.2334575*pow(10, -9) #pixels/meter
-P2M = 1.623541*pow(10,-10) 
+P2M = 1.2334575*pow(10, -9) #pixels/meter
+#P2M = 1.623541*pow(10,-10) 
 
 class Planet:
 
@@ -96,31 +94,31 @@ def main():
     #integration time
     dt = 43200  #seconds
 
+    #setting up file for data output
+    f = open("solar.dat", "w")
+    #for planet in planets:
+     #   f.write("%f\t%f\t%f\t%f\n" % (planet.x, planet.y, planet.vx. planet.vy))
+
+
     #main loop of the program
     i = 0
-    while (i < 50000):
+    while (i < 5000):
         for planet in planets:
             r  = math.sqrt(pow(sun.x-planet.x, 2) + pow(sun.y-planet.y, 2))
             rx = sun.x-planet.x
             ry = sun.y-planet.y
 
-            axsun = (G*planet.m)*(-rx)/pow(r, 3)
-            aysun = (G*planet.m)*(-ry)/pow(r, 3)
             axplanet = (G*sun.m)*(rx)/pow(r, 3)
             ayplanet = (G*sun.m)*(ry)/pow(r, 3)
 
-            vxsun = sun.vx + axsun*dt
-            vysun = sun.vy + aysun*dt
             vxplanet = planet.vx + axplanet*dt
             vyplanet = planet.vy + ayplanet*dt
 
-            xsun = sun.x + vxsun*dt
-            ysun = sun.y + vysun*dt
             xplanet = planet.x + vxplanet*dt
             yplanet = planet.y + vyplanet*dt
         
-            sun.update(xsun, ysun, vxsun, vysun)
             planet.update(xplanet, yplanet, vxplanet, vyplanet)
+            f.write("%f\t%f\t%f\t%f\n" % (planet.x, planet.y, planet.vx, planet.vy))
 
             pygame.draw.circle(window, sun.color, (int(sun.x*P2M) + WIDTH/2, int(sun.y*P2M) + HEIGHT/2), 25, 0)
             pygame.draw.circle(window, BLACK, (int(sun.x*P2M) + WIDTH/2, int(sun.y*P2M) + HEIGHT/2), 1, 0)
@@ -128,9 +126,9 @@ def main():
 
         t = str((i*dt)/86400)
         timestamp(t + " Days", tfont, window)
-        #time.sleep(0.01)
         i += 1
     
+    f.close()
     time.sleep(10)
-
+    
 main()
