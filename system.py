@@ -82,27 +82,27 @@ def make_objects():
 
 def main():
     #setting up the display window
-    pygame.init()
+    '''pygame.init()
     window = pygame.display.set_mode((WIDTH, HEIGHT))
     tfont = pygame.font.Font('freesansbold.ttf', 30)
     pygame.display.set_caption("The Solar System")
-    
+    '''
     #initializing the celestial bodies
     planets = make_objects()
     sun     = Planet(1.9890*pow(10, 30), 0, 0, 0, 0, YELLOW)
  
     #integration time
-    dt = 43200  #seconds
+    dt = 86400  #seconds
 
     #setting up file for data output
-    f = open("solar.dat", "w")
+    f = open("solar_86400.csv", "w")
     #for planet in planets:
      #   f.write("%f\t%f\t%f\t%f\n" % (planet.x, planet.y, planet.vx. planet.vy))
 
 
     #main loop of the program
     i = 0
-    while (i < 5000):
+    while (i < 50000):
         for planet in planets:
             r  = math.sqrt(pow(sun.x-planet.x, 2) + pow(sun.y-planet.y, 2))
             rx = sun.x-planet.x
@@ -118,14 +118,16 @@ def main():
             yplanet = planet.y + vyplanet*dt
         
             planet.update(xplanet, yplanet, vxplanet, vyplanet)
-            f.write("%f\t%f\t%f\t%f\n" % (planet.x, planet.y, planet.vx, planet.vy))
-
+            f.write("%f, %f, %f, %f, %f\n" % (i*dt, planet.x, planet.y, planet.vx, planet.vy))
+            
+            '''
             pygame.draw.circle(window, sun.color, (int(sun.x*P2M) + WIDTH/2, int(sun.y*P2M) + HEIGHT/2), 25, 0)
             pygame.draw.circle(window, BLACK, (int(sun.x*P2M) + WIDTH/2, int(sun.y*P2M) + HEIGHT/2), 1, 0)
             pygame.draw.circle(window, planet.color, (int(planet.x*P2M + WIDTH/2), int(planet.y*P2M) + HEIGHT/2), 2, 0)
-
+            '''
+            
         t = str((i*dt)/86400)
-        timestamp(t + " Days", tfont, window)
+        #timestamp(t + " Days", tfont, window)
         i += 1
     
     f.close()
